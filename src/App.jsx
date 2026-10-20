@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FormularioCompra from './components/FormularioCompra.jsx';
+import FormularioCompra from './components/FormularioCompra';
 import ListaCompras from './components/ListaCompras';
 
 function App() {
@@ -7,9 +7,13 @@ function App() {
 
   return (
     <div>
-      <h1>Tienda de Juegos</h1>
-      <FormularioCompra onSave={() => setRecargar(r => r + 1)} />
-      <ListaCompras recargar={recargar} />
+      <h1>🎮 Tienda de Juegos</h1>
+      <div className="card">
+        <FormularioCompra onSave={() => setRecargar(r => r + 1)} />
+      </div>
+      <div className="card">
+        <ListaCompras recargar={recargar} />
+      </div>
     </div>
   );
 }
