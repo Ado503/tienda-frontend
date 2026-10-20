@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 
-function FormularioCompra({ onSave }) {
+function FormularioCompra({ onSave, avisar }) {
   const [formData, setFormData] = useState({
     cliente_id: '', juego_id: '', cantidad: '', fecha: ''
   });
@@ -18,16 +18,18 @@ function FormularioCompra({ onSave }) {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    api.post('/compras', formData)
-      .then(res => {
-        alert(res.data.message);
-        setFormData({ cliente_id: '', juego_id: '', cantidad: '', fecha: '' });
-        if (onSave) onSave();
-      })
-      .catch(err => console.error('Error al registrar compra:', err));
-  };
-
+  e.preventDefault();
+  api.post('/compras', formData)
+    .then(() => {
+      setFormData({ cliente_id: '', juego_id: '', cantidad: '', fecha: '' });
+      if (onSave) onSave();
+      avisar('Compra registrada ✔');
+    })
+    .catch(err => {
+      console.error('Error al registrar compra:', err);
+      avisar('No se pudo registrar la compra', 'error');
+    });
+};
   return (
     <div>
       <h2>Registrar Nueva Compra</h2>

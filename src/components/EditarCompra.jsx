@@ -20,15 +20,14 @@ function EditarCompra({ compra, onUpdate }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    api.put(`/compras/${compra.id}`, formData)
-      .then(res => {
-        alert(res.data.message);
-        onUpdate();
-      })
-      .catch(err => console.error('Error al actualizar compra:', err));
-  };
+const handleSubmit = (e) => {
+  e.preventDefault();
+  api.put(`/compras/${compra.id}`, formData)
+    .then(() => {
+      onUpdate();
+    })
+    .catch(err => console.error('Error al actualizar compra:', err));
+};
 
   return (
     <form onSubmit={handleSubmit}>

@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../api';
 import EditarCompra from './EditarCompra';
 
-function ListaCompras({ recargar }) {
+function ListaCompras({ recargar, avisar }) {
   const [compras, setCompras] = useState([]);
   const [compraSeleccionada, setCompraSeleccionada] = useState(null);
+  const [confirmarId, setConfirmarId] = useState(null);
 
   const cargarCompras = () => {
     api.get('/compras')
@@ -16,21 +17,23 @@ function ListaCompras({ recargar }) {
     cargarCompras();
   }, [recargar]);
 
-  const eliminarCompra = (id) => {
-    if (window.confirm('¿Seguro que deseas eliminar esta compra?')) {
-      api.delete(`/compras/${id}`)
-        .then(res => {
-          alert(res.data.message);
-          cargarCompras();
-        })
-        .catch(err => console.error('Error al eliminar compra:', err));
-    }
+  const eliminarCompra = () => {
+    api.delete(`/compras/${confirmarId}`)
+      .then(() => {
+        cargarCompras();
+        avisar('Compra eliminada');
+      })
+      .catch(err => {
+        console.error('Error al eliminar compra:', err);
+        avisar('No se pudo eliminar la compra', 'error');
+      })
+      .finally(() => setConfirmarId(null));
   };
 
   return (
     <div>
       <h2>Compras de la Tienda</h2>
-      <table border="1">
+      <table>
         <thead>
           <tr>
             <th>Cliente</th>
@@ -55,7 +58,7 @@ function ListaCompras({ recargar }) {
               <td>{c.fecha}</td>
               <td>
                 <button onClick={() => setCompraSeleccionada(c)}>Editar</button>
-                <button onClick={() => eliminarCompra(c.id)}>Eliminar</button>
+                <button onClick={() => setConfirmarId(c.id)}>Eliminar</button>
               </td>
             </tr>
           ))}
@@ -66,8 +69,29 @@ function ListaCompras({ recargar }) {
         <EditarCompra
           key={compraSeleccionada.id}
           compra={compraSeleccionada}
-          onUpdate={() => { setCompraSeleccionada(null); cargarCompras(); }}
+          onUpdate={() => {
+            setCompraSeleccionada(null);
+            cargarCompras();
+            avisar('Compra actualizada ✔');
+          }}
         />
+      )}
+
+      {confirmarId && (
+        <div className="overlay" onClick={() => setConfirmarId(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>¿Eliminar esta compra?</h3>
+            <p>Esta acción no se puede deshacer.</p>
+            <div className="modal-botones">
+              <button className="btn-cancelar" onClick={() => setConfirmarId(null)}>
+                Cancelar
+              </button>
+              <button className="btn-eliminar" onClick={eliminarCompra}>
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
